@@ -3,7 +3,7 @@ version: '3.5'
 services:
   http-server:
     # Creates an image of application
-    image: chitturi/docker  
+    image: chitturi/docker 
     # Deploys the application:
     deploy:
       # Replicates into 5 instances of the application image
