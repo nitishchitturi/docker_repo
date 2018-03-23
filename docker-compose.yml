@@ -1,0 +1,62 @@
+version: '3.5'
+
+services:
+  http-server:
+    # Creates an image of application
+    image: chitturi/docker  
+    # Deploys the application:
+    deploy:
+      # Replicates into 5 instances of the application image
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 500M
+      #restart condition
+      restart_policy:
+        condition: on-failure
+    #ports
+    ports:
+      - "3000:3000"
+    #master and slave links
+    links:
+      - redis-master
+      - redis-slave
+    #dependencies
+    depends_on:
+      - redis-master
+      - redis-slave
+    #network to connect
+    networks:
+      - webnet
+#Details of Redis-master
+  redis-master:
+    image: redis:4.0.8
+    deploy:
+      replicas: 5
+    expose:
+      - 3689
+    entrypoint:
+      - redis-server
+      - --loglevel
+      - verbose
+    networks:
+      - webnet
+#Details of Redis-slave
+  redis-slave:
+    image: redis:4.0.8
+    deploy:
+      replicas: 5
+    expose:
+      - 3689
+    entrypoint:
+      - redis-server
+      - --slaveof
+      - redis-master
+      - "3689"
+      - --loglevel
+      - verbose
+    networks:
+      - webnet
+networks:
+  webnet:
